@@ -1,0 +1,80 @@
+Description: >
+  Mahmoud.AbdelFattah - DevOps engineer - proj: CloudFormationWideBot
+  
+  this stack will export "IAM instance profile" id to be attached later in launch config. of our server instance, 
+  this instanceprofile will allow ec2 instance to "get" website files from S3
+  
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+  
+Resources:
+# IAM role can’t be directly attached to an EC2 instance. First instance profile needs to be created with the role and then instance profile is attached to an instance.
+# How to attach policy to the role before attaching the role to instance profile?
+	# aws managed policy: attached directly to the role resource under the Roles section and referneced by its ARN
+	# customer managed policy: two options,  create it in a separated resource and the role is refernced there in the policy resource
+	# inline ploicy: as customer managed plicy
+#Ref: in the notes file	
+# instance profile is not showing in the aws console while creating the role, but actually it consists of the role itself and the policies attacted
+# in general, when you create role, you have the following steps, and the output is the profile.
+# 1- [trust policy]you choose the service"principal" that can assume this role, called "trust relationships", Trust policies define which entities can assume the role. But you can associate only one trust policy with a role.
+# 2- [policy] you can attach the policies to the role under the same resource"managed policies", or creating another resource for the policy like"inline policies"
+
+# [trust policy - or trsust relationships]: you can see the same following content in the aws console by selecting any role, then choose the [trust relationships] tab
+  WideBotRolIAM:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub "${EnvironmentName}-WideBot-Role"
+      # 1- [trust policy]who can assume this role "trsust relationships"
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - ec2.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+# in the above role resource, you can add the second component whic is the "policies" or permissions, or you can create another policy resource as the following resource and refer to the iam in the reource.
+# types of policies: awsmanaged , customer managed, inline policies
+# 2- the [policy] itself, the following is an inline policy, used one time, so can not attached to another resource.
+  WideBotPolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub "${EnvironmentName}-WideBot-Policies"
+      # permissions allowed 
+      PolicyDocument:
+        Statement:
+        - Effect: Allow
+          Action: 
+          - "ec2:DescribeAddresses"
+          - "ec2:AllocateAddress"
+          - "ec2:DescribeInstances"
+          - "ec2:AssociateAddress"
+          - "ssm:Get*"
+          - "s3:Get*"
+          Resource: '*'
+      Roles:
+      - !Ref WideBotRolIAM
+      
+  WideBotInstanceProfile:
+    Type: "AWS::IAM::InstanceProfile"
+    Descrption: this the Role itself 
+    Properties:
+      Path: "/"
+      Roles:
+      - !Ref WideBotRolIAM
+
+Outputs: 
+  WideBotRol:
+    Description: WideBot Rol
+    Value: !Ref WideBotRolIAM
+    Export:
+      Name: !Sub ${EnvironmentName}-WideBotRol
+
+  InstanceProfile:
+    Description: Instance profile of WideBot Rol
+    Value: !Ref WideBotInstanceProfile
+    Export:
+      Name: !Sub ${EnvironmentName}-InstanceProfile
