@@ -1,0 +1,11 @@
+[
+	{
+		"ParameterKey": "EnvironmentName",
+		"ParameterValue": "CloudFormationWideBot"
+    },
+	{
+		"ParameterKey": "NameBucket",
+		"ParameterValue": "WideBot-s3-store"
+    }
+
+]

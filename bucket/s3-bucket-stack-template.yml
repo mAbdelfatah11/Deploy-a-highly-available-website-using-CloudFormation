@@ -1,0 +1,34 @@
+Description: >
+  Mahmoud.Abdelfatah / DevOps engineer / Proj: CloudFormationWideBot
+  
+  
+  this stack Creates S3 bucket to store website files.
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+  
+  NameBucket:
+    Description: Unique name of the S3 bucket where stores the files to deploy
+    Type: String
+    Default: WideBot-s3-bucket
+
+Resources:
+
+  WideBotBucketS3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref NameBucket
+    DeletionPolicy: Delete
+
+Outputs: 
+  DataBucket:
+    Value: !Ref WideBotBucketS3
+    Description: WideBot bucket that stores web archive
+    Export:
+      Name: !Sub ${EnvironmentName}-DataBucket
+
+  DataBucketARN:
+    Value: !Join ["", ["arn:aws:s3:::", !Ref "WideBotBucketS3", "/*"]]
+    Export:
+      Name: !Sub ${EnvironmentName}-DataBucketARN
