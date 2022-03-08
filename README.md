@@ -46,7 +46,7 @@ Our company is creating a new Website clone called WideBot,
 The solution consists of dividing the entire infrastructure into different stacked template files, allowing the project to have modularity.
 
 > ### Files structure
-1. The 'utils' folder contains all the required scripts which will help to deploy the stacks in an automated manner.
+1. The `utils` folder contains all the required scripts which will help to deploy the stacks in an automated manner.
 2. The `network` folder has the files to deploy a stack with the whole network infrastructure.
 3. The `bastion` folder has the files to deploy a stack with a bastion host in order to connect to website hosts in a secure way.
 4. The `bucket` folder has the files to deploy a stack with the `AWS::S3` bucket that stores the website files, that is, `Udacity.zip`
