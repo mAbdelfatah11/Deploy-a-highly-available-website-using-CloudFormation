@@ -1,19 +1,17 @@
 # Deploy a high-availability web app using CloudFormation
-Mahmoud AbdelFatah / DEvOps engineer - WideBot
+Mahmoud AbdelFatah / DevOps Engineer - WideBot
 
 
-##Problem:
-========
+## Problem
 
 Our company is creating a new Website clone called WideBot,
 
-	1. Developers pushed the latest version of their code in a zip file located in a public S3 Bucket.
+1. Developers pushed the latest version of their code in a zip file located in a public S3 Bucket.
 
-	2. I have been tasked with deploying the application, by retrieving the last version code from s3 and deploy it in server.
+2. I have been tasked with deploying the application, by retrieving the last version code from s3 and deploy it in server.
 
  
-##Server specs:
-
+> ### Server Spec.:
 
 1. You'll need to create a Launch Configuration for your application servers in order to deploy four servers, two located in each of your private subnets. The launch configuration will be used by an auto-scaling group.
 
@@ -22,7 +20,7 @@ Our company is creating a new Website clone called WideBot,
 3. Be sure to allocate at least 10GB of disk space so that you don't run into issues. 
 
 
-##Security Groups and Roles:
+> ### Security Groups and Roles:
 
 
 1. Since you will be downloading the application archive from an S3 Bucket, you'll need to create an IAM Role that allows your instances to use the S3 Service.
@@ -41,27 +39,46 @@ Our company is creating a new Website clone called WideBot,
 
 > ### Diagram
 
-![Diagram](/Architecture-Diagram.png)
+![Diagram](/docs/Architecture-Diagram.png)
 
 > ### Description
 
-The solution consisted in split the whole infrastructure in differents stack template files this allow that the project has modularity.
+The solution consists of dividing the entire infrastructure into different stacked template files, allowing the project to have modularity.
 
 > ### Files structure
-1. The `network` folder has the files to deploy a stack with the whole network to the will using in the project.
-2. The `bastion` folder has the files to deploy a stack with a bastion host to connect the hosts with the website of a secure way.
-3. The `bucket` folder has the files to deploy a stack with the `AWS::S3` bucket that stores the website files, that is, `Udacity.zip`
-4. The `iam` folder has the files to deploy a stack with the role that will use to upload/download files from the bucket
-5. The `server` folder has the files to deploy a stack with the website hosts. Also deploy these hosts using `LoadBalancer`, `AutoScaling`, and `ClouWatch` alarms.
-6. The `src` folder has the website files to deploy.
-7. The `utils` folder has the code files using to help such as utilities.
+1. The 'utils' folder contains all the required scripts which will help to deploy the stacks in an automated manner.
+2. The `network` folder has the files to deploy a stack with the whole network infrastructure.
+3. The `bastion` folder has the files to deploy a stack with a bastion host in order to connect to website hosts in a secure way.
+4. The `bucket` folder has the files to deploy a stack with the `AWS::S3` bucket that stores the website files, that is, `Udacity.zip`
+5. The `iam` folder has the files to deploy a stack with the InstanceProfile that will be used by hosts to upload/download files from the bucket.
+6. The `server` folder has the files to deploy a stack with the website hosts, in addition to `LoadBalancer`, `AutoScaling`, and `ClouWatch` alarms.
+7. The `src` folder has the website files to deploy.
+
+
 
 > ### Instructions
 
-This is a project that anyone could uses to learn about CloudFormation, if you want to deploy this project follow the instructions are below:
+1. You need to create a Secure KeyPair that will be used later to connect to the Bastion Host,then to the web servers, so in the terminal use the file `utils/create-secure-key.sh` to create the key pair.
+  
+  > `utils/create-secure-key.sh`
+	
+	     File content discription:
 
-1. You need to create a Secure KeyPair that will use to connect to Bastion Host, in a terminal using the file `utils/create-secure-key.sh`
-    > `utils/create-secure-key.sh`
+		ssh-keygen -t rsa -b 4096 -f ~/.ssh/udagramBastionKey -C "Udagram bastion key" -N '' -q
+			ssh-keygen is a third party tool to create key-pairs  using cli
+			the output will be two keys "puplic and private" like the lock and key
+			these two keys are stored in "/home/user/.ssh/" folder
+
+		aws ec2 import-key-pair --key-name "udagramBastionKey" --public-key-material fileb://~/.ssh/udagramBastionKey.pub
+
+			the above command will import the puplic key from my computer to aws, 
+			in order to be associated directly to any instance or launch config. resource code.
+
+		aws ssm put-parameter --name 'udagramBastionKeyPrivate' --value "$(cat ~/.ssh/udagramBastionKey)" --type SecureString --overwrite
+		aws ssm put-parameter --name 'udagramBastionKey' --value "$(cat ~/.ssh/udagramBastionKey.pub)" --type SecureString --overwrite
+
+			we use parameter store which is one osf the SSM-system manager services, we use it to store our config. data in aws, so 
+			you can import them in cloudformation scripts
 
 2. You need to create the website files to upload to S3 Bucket, in a terminal using the command zip, 
     > `zip udacity.zip src/*`
