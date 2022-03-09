@@ -65,20 +65,20 @@ The solution consists of dividing the entire infrastructure into different stack
 	     File content discription:
 
 		ssh-keygen -t rsa -b 4096 -f ~/.ssh/WideBotBastionKey -C "WideBot bastion key" -N '' -q
-			ssh-keygen is a third party tool to create key-pairs  using cli
-			the output will be two keys "puplic and private" like the lock and key
-			these two keys are stored in "/home/user/.ssh/" folder
+			# ssh-keygen is a third party tool to create key-pairs  using cli
+			# the output will be the two keys "puplic and private" like the lock and key
+			# these two keys are stored in "/home/user/.ssh/" folder
 
 		aws ec2 import-key-pair --key-name "WideBotBastionKey" --public-key-material fileb://~/.ssh/WideBotBastionKey.pub
 
-			the above command will import the puplic key from my computer to aws, 
-			in order to be associated directly to any instance or launch config. resource code.
+			# the above command will import the puplic key from my computer to aws, 
+			# in order to be associated directly to any instance or launch config. resource code.
 
 		aws ssm put-parameter --name 'WideBotBastionKeyPrivate' --value "$(cat ~/.ssh/WideBotBastionKey)" --type SecureString --overwrite
 		aws ssm put-parameter --name 'WideBotBastionKey' --value "$(cat ~/.ssh/WideBotBastionKey.pub)" --type SecureString --overwrite
 
-			we use parameter store which is one osf the SSM-system manager services, we use it to store our config. data in aws, so 
-			you can import them in cloudformation scripts
+			# we use parameter store which is one of the SSM-system manager services, we use it to store our config. data in aws, so 
+			# you can import them in cloudformation scripts
 
 2. You need to create the website files to upload to S3 Bucket, in a terminal using the command zip, 
     > `zip WebsiteFiles.zip src/*`
