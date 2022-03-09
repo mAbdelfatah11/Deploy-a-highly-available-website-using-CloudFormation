@@ -49,7 +49,7 @@ The solution consists of dividing the entire infrastructure into different stack
 1. The `utils` folder contains all the required scripts which will help to deploy the stacks in an automated manner.
 2. The `network` folder has the files to deploy a stack with the whole network infrastructure.
 3. The `bastion` folder has the files to deploy a stack with a bastion host in order to connect to website hosts in a secure way.
-4. The `bucket` folder has the files to deploy a stack with the `AWS::S3` bucket that stores the website files, that is, `Udacity.zip`
+4. The `bucket` folder has the files to deploy a stack with the `AWS::S3` bucket that stores the website files, that is, `WebsiteFiles.zip`
 5. The `iam` folder has the files to deploy a stack with the InstanceProfile that will be used by hosts to upload/download files from the bucket.
 6. The `server` folder has the files to deploy a stack with the website hosts, in addition to `LoadBalancer`, `AutoScaling`, and `ClouWatch` alarms.
 7. The `src` folder has the website files to deploy.
@@ -64,24 +64,24 @@ The solution consists of dividing the entire infrastructure into different stack
 	
 	     File content discription:
 
-		ssh-keygen -t rsa -b 4096 -f ~/.ssh/udagramBastionKey -C "Udagram bastion key" -N '' -q
+		ssh-keygen -t rsa -b 4096 -f ~/.ssh/WideBotBastionKey -C "WideBot bastion key" -N '' -q
 			ssh-keygen is a third party tool to create key-pairs  using cli
 			the output will be two keys "puplic and private" like the lock and key
 			these two keys are stored in "/home/user/.ssh/" folder
 
-		aws ec2 import-key-pair --key-name "udagramBastionKey" --public-key-material fileb://~/.ssh/udagramBastionKey.pub
+		aws ec2 import-key-pair --key-name "WideBotBastionKey" --public-key-material fileb://~/.ssh/WideBotBastionKey.pub
 
 			the above command will import the puplic key from my computer to aws, 
 			in order to be associated directly to any instance or launch config. resource code.
 
-		aws ssm put-parameter --name 'udagramBastionKeyPrivate' --value "$(cat ~/.ssh/udagramBastionKey)" --type SecureString --overwrite
-		aws ssm put-parameter --name 'udagramBastionKey' --value "$(cat ~/.ssh/udagramBastionKey.pub)" --type SecureString --overwrite
+		aws ssm put-parameter --name 'WideBotBastionKeyPrivate' --value "$(cat ~/.ssh/WideBotBastionKey)" --type SecureString --overwrite
+		aws ssm put-parameter --name 'WideBotBastionKey' --value "$(cat ~/.ssh/WideBotBastionKey.pub)" --type SecureString --overwrite
 
 			we use parameter store which is one osf the SSM-system manager services, we use it to store our config. data in aws, so 
 			you can import them in cloudformation scripts
 
 2. You need to create the website files to upload to S3 Bucket, in a terminal using the command zip, 
-    > `zip udacity.zip src/*`
+    > `zip WebsiteFiles.zip src/*`
 
 3. You need to create the s3 and iam stacks, in a terminal using the file `utils/create-stack-key.sh` 
     > `utils/create-stack.sh iam-stack iam/iam-stack-template.yml iam/iam-parameters.json`
@@ -89,7 +89,7 @@ The solution consists of dividing the entire infrastructure into different stack
     > `utils/create-stack.sh s3-stack bucket/s3-bucket-stack-template.yml bucket/s3-bucket-parameters.json`
 
 4. You need to upload the website files created previously to s3 bucket, in a terminal using aws cli
-    > `aws s3 cp udacity.zip s3://udagram-s3-store`
+    > `aws s3 cp WebsiteFiles.zip s3://WideBot-s3-store`
 
 5. You need to create the other stacks described above, in a terminal
 
