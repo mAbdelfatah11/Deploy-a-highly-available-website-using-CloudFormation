@@ -1,10 +1,10 @@
 # Deploy a high-availability web app using CloudFormation
-Mahmoud AbdelFatah / DevOps Engineer - WideBot
+Mahmoud AbdelFatah / DevOps Engineer
 
 
 ## Problem
 
-Our company is creating a new Website clone called WideBot,
+Our company is creating a new Website clone,
 
 1. Developers pushed the latest version of their code in a zip file located in a public S3 Bucket.
 
